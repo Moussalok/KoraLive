@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { MOCK_MATCHES, LEAGUES } from './mockData';
 import { Match, MatchStatus } from './types';
 import MatchCard from './components/MatchCard';
@@ -13,7 +13,6 @@ const App: React.FC = () => {
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [analysis, setAnalysis] = useState<string>('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const filteredMatches = useMemo(() => {
     return MOCK_MATCHES.filter(match => {
@@ -22,11 +21,6 @@ const App: React.FC = () => {
       return leagueMatch && statusMatch;
     });
   }, [activeLeague, activeTab]);
-
-  const handleRefresh = () => {
-    setIsRefreshing(true);
-    setTimeout(() => setIsRefreshing(false), 1000);
-  };
 
   const handleAnalyze = async (match: Match) => {
     setSelectedMatch(match);
@@ -39,33 +33,27 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-screen pb-20">
       {/* Header */}
-      <header className="bg-green-700 text-white sticky top-0 z-40 shadow-md p-4 safe-area-inset-top">
+      <header className="bg-green-700 text-white sticky top-0 z-40 shadow-lg p-4">
         <div className="max-w-4xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-3">
-             <div className="bg-white p-1 rounded-lg shadow-inner">
-                <svg className="w-7 h-7 text-green-700" fill="currentColor" viewBox="0 0 24 24">
+          <div className="flex items-center gap-2">
+             <div className="bg-white p-1.5 rounded-lg">
+                <svg className="w-6 h-6 text-green-700" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM12 4c-.55 0-1 .45-1 1v1.17c-2.03.23-3.77 1.63-4.33 3.53a1 1 0 1 0 1.91.58c.28-.95 1.15-1.65 2.17-1.76V11c-1.66 0-3 1.34-3 3v2c0 1.66 1.34 3 3 3v1c0 .55.45 1 1 1s1-.45 1-1v-1c1.66 0 3-1.34 3-3v-2c0-1.66-1.34-3-3-3V8.51c2.03-.23 3.77-1.63 4.33-3.53a1 1 0 1 0-1.91-.58c-.28.95-1.15 1.65-2.17 1.76V5c0-.55-.45-1-1-1zm0 9c.55 0 1 .45 1 1v2c0 .55-.45 1-1 1s-1-.45-1-1v-2c0-.55.45-1 1-1z" />
                 </svg>
              </div>
-             <h1 className="text-xl font-black tracking-tight">كورة ناو</h1>
+             <h1 className="text-xl font-black">كورة ناو</h1>
           </div>
-          
-          <button 
-            onClick={handleRefresh}
-            className={`p-2 rounded-full hover:bg-green-600 transition-transform ${isRefreshing ? 'animate-spin' : ''}`}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-          </button>
+          <div className="text-sm font-medium opacity-80">
+            {new Date().toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' })}
+          </div>
         </div>
       </header>
 
       <main className="max-w-4xl mx-auto p-4 space-y-6">
         {/* League Horizontal Filter */}
-        <section className="sticky top-[72px] bg-gray-50/95 backdrop-blur-sm z-30 pt-2">
+        <section>
           <LeagueFilter 
             leagues={LEAGUES} 
             activeLeague={activeLeague} 
@@ -74,22 +62,22 @@ const App: React.FC = () => {
         </section>
 
         {/* Status Tabs */}
-        <section className="flex bg-white rounded-xl shadow-sm overflow-hidden p-1 border">
+        <section className="flex border-b border-gray-200">
           <button 
             onClick={() => setActiveTab(MatchStatus.LIVE)}
-            className={`flex-1 py-3 text-sm font-bold rounded-lg transition-all ${activeTab === MatchStatus.LIVE ? 'bg-green-600 text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}
+            className={`flex-1 py-3 text-sm font-bold border-b-2 transition-all ${activeTab === MatchStatus.LIVE ? 'border-green-600 text-green-700' : 'border-transparent text-gray-500'}`}
           >
             المباشر
           </button>
           <button 
             onClick={() => setActiveTab(MatchStatus.UPCOMING)}
-            className={`flex-1 py-3 text-sm font-bold rounded-lg transition-all ${activeTab === MatchStatus.UPCOMING ? 'bg-green-600 text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}
+            className={`flex-1 py-3 text-sm font-bold border-b-2 transition-all ${activeTab === MatchStatus.UPCOMING ? 'border-green-600 text-green-700' : 'border-transparent text-gray-500'}`}
           >
             القادمة
           </button>
           <button 
             onClick={() => setActiveTab(MatchStatus.FINISHED)}
-            className={`flex-1 py-3 text-sm font-bold rounded-lg transition-all ${activeTab === MatchStatus.FINISHED ? 'bg-green-600 text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}
+            className={`flex-1 py-3 text-sm font-bold border-b-2 transition-all ${activeTab === MatchStatus.FINISHED ? 'border-green-600 text-green-700' : 'border-transparent text-gray-500'}`}
           >
             النتائج
           </button>
@@ -106,12 +94,8 @@ const App: React.FC = () => {
               />
             ))
           ) : (
-            <div className="col-span-full py-20 text-center text-gray-500 bg-white rounded-2xl shadow-sm border border-dashed">
-              <div className="mb-4 flex justify-center opacity-20">
-                 <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM12 4c-.55 0-1 .45-1 1v1.17c-2.03.23-3.77 1.63-4.33 3.53a1 1 0 1 0 1.91.58c.28-.95 1.15-1.65 2.17-1.76V11c-1.66 0-3 1.34-3 3v2c0 1.66 1.34 3 3 3v1c0 .55.45 1 1 1s1-.45 1-1v-1c1.66 0 3-1.34 3-3v-2c0-1.66-1.34-3-3-3V8.51c2.03-.23 3.77-1.63 4.33-3.53a1 1 0 1 0-1.91-.58c-.28.95-1.15 1.65-2.17 1.76V5c0-.55-.45-1-1-1zm0 9c.55 0 1 .45 1 1v2c0 .55-.45 1-1 1s-1-.45-1-1v-2c0-.55.45-1 1-1z" /></svg>
-              </div>
-              <p className="font-bold text-lg">لا توجد مباريات في الوقت الحالي</p>
-              <p className="text-sm">جرب اختيار دوري آخر أو العودة لاحقاً</p>
+            <div className="col-span-full py-12 text-center text-gray-500 bg-white rounded-xl border border-dashed">
+              <p className="font-bold">لا يوجد مباريات متوفرة حالياً في هذا القسم</p>
             </div>
           )}
         </section>
@@ -126,22 +110,18 @@ const App: React.FC = () => {
       />
 
       {/* Floating Bottom Nav for Mobile */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t p-3 flex justify-around items-center md:hidden z-40 pb-6">
-        <button className="flex flex-col items-center gap-1.5 text-green-700">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t p-2 flex justify-around items-center md:hidden z-40">
+        <button className="flex flex-col items-center gap-1 text-green-600">
            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-           <span className="text-xs font-bold">الرئيسية</span>
+           <span className="text-[10px] font-bold">الرئيسية</span>
         </button>
-        <button className="flex flex-col items-center gap-1.5 text-gray-400">
+        <button className="flex flex-col items-center gap-1 text-gray-400">
            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zM7 10h2v7H7zm4-3h2v10h-2zm4 6h2v4h-2z"/></svg>
-           <span className="text-xs font-bold">الترتيب</span>
+           <span className="text-[10px] font-bold">الترتيب</span>
         </button>
-        <button className="flex flex-col items-center gap-1.5 text-gray-400">
+        <button className="flex flex-col items-center gap-1 text-gray-400">
            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8h16v10z"/></svg>
-           <span className="text-xs font-bold">الأخبار</span>
-        </button>
-        <button className="flex flex-col items-center gap-1.5 text-gray-400">
-           <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-           <span className="text-xs font-bold">عن التطبيق</span>
+           <span className="text-[10px] font-bold">الأخبار</span>
         </button>
       </nav>
     </div>
